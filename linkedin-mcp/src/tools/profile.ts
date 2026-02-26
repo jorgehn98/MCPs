@@ -10,20 +10,20 @@ export function registerProfileTools(server: McpServer) {
     async () => {
       try {
         const profile = await getMyProfile();
-        const personUrn = `urn:li:person:${profile.id}`;
+        // /v2/userinfo (OpenID Connect) uses 'sub' as the member identifier
+        const personUrn = `urn:li:person:${profile.sub}`;
         return {
           content: [{
             type: 'text',
             text: JSON.stringify({
-              id: profile.id,
+              id: profile.sub,
               urn: personUrn,
-              firstName: profile.localizedFirstName,
-              lastName: profile.localizedLastName,
-              headline: profile.localizedHeadline,
-              vanityName: profile.vanityName,
-              profileUrl: profile.vanityName
-                ? `https://www.linkedin.com/in/${profile.vanityName}`
-                : null,
+              firstName: profile.given_name,
+              lastName: profile.family_name,
+              name: profile.name,
+              picture: profile.picture,
+              email: profile.email,
+              locale: profile.locale,
             }, null, 2),
           }],
         };

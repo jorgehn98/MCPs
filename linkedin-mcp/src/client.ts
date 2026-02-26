@@ -33,10 +33,11 @@ const V2_BASE = 'https://api.linkedin.com/v2';
 // ─── Profile ──────────────────────────────────────────────────────────────────
 
 export async function getMyProfile() {
-  const res = await axios.get(`${V2_BASE}/me`, {
+  // /v2/userinfo is the OpenID Connect endpoint available with 'openid' + 'profile' scopes.
+  // The legacy /v2/me endpoint required r_basicprofile which is restricted to LinkedIn partners.
+  const res = await axios.get(`${V2_BASE}/userinfo`, {
     headers: {
       Authorization: `Bearer ${getAccessToken()}`,
-      'X-Restli-Protocol-Version': '2.0.0',
     },
   });
   return res.data;
