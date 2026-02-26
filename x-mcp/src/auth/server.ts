@@ -97,7 +97,7 @@ app.get('/callback', async (req, res) => {
     );
 
     const tokens = saveTokens(response.data);
-    const expiryDate = new Date(tokens.obtained_at + tokens.expires_in * 1000).toLocaleDateString();
+    const lifetimeHours = Math.round(tokens.expires_in / 3600);
 
     res.send(`
       <html><body style="font-family:sans-serif;padding:2rem;max-width:600px;margin:0 auto">
@@ -105,8 +105,8 @@ app.get('/callback', async (req, res) => {
         <p>Tokens saved. You can close this window.</p>
         <ul>
           <li><strong>Scopes:</strong> ${tokens.scope}</li>
-          <li><strong>Token expires:</strong> ${expiryDate}</li>
-          <li><strong>Refresh token:</strong> ${tokens.refresh_token ? 'Yes (auto-refresh enabled)' : 'No'}</li>
+          <li><strong>Access token lifetime:</strong> ${lifetimeHours}h (this is normal — X access tokens are short-lived by design)</li>
+          <li><strong>Auto-refresh:</strong> ${tokens.refresh_token ? '✅ Enabled — the MCP refreshes automatically, no action needed' : '❌ No refresh token — re-run auth when expired'}</li>
         </ul>
         <p>Your MCP server is ready. Restart Claude Code to load it.</p>
       </body></html>
@@ -114,9 +114,9 @@ app.get('/callback', async (req, res) => {
 
     console.log('\n✅ Tokens saved to .tokens.json');
     console.log(`   Scopes: ${tokens.scope}`);
-    console.log(`   Expires: ${expiryDate}`);
+    console.log(`   Access token lifetime: ${lifetimeHours}h (auto-refreshes via refresh token)`);
     if (tokens.refresh_token) {
-      console.log('   Auto-refresh: enabled');
+      console.log('   Auto-refresh: enabled — no action needed when access token expires');
     }
     console.log('\nYou can stop this server with Ctrl+C\n');
   } catch (err: unknown) {

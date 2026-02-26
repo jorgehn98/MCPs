@@ -20,13 +20,7 @@ const SCOPES = [
   'openid',
   'profile',
   'email',
-  'r_basicprofile',
   'w_member_social',
-  'r_organization_social',
-  'w_organization_social',
-  'w_member_social_feed',
-  'r_organization_social_feed',
-  'w_organization_social_feed',
 ].join(' ');
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
@@ -77,7 +71,7 @@ app.get('/callback', async (req, res) => {
         <ul>
           <li><strong>Scopes:</strong> ${tokens.scope}</li>
           <li><strong>Token expires:</strong> ${expiryDate}</li>
-          <li><strong>Refresh token:</strong> ${tokens.refresh_token ? 'Yes' : 'No'}</li>
+          <li><strong>Auto-refresh:</strong> ${tokens.refresh_token ? '✅ Enabled' : '❌ Not available — LinkedIn does not provide refresh tokens on the basic tier. Re-run <code>npm run auth</code> before this date.'}</li>
         </ul>
         <p>Your MCP server is ready. Restart Claude Code to load it.</p>
       </body></html>
@@ -86,6 +80,9 @@ app.get('/callback', async (req, res) => {
     console.log('\n✅ Tokens saved to .tokens.json');
     console.log(`   Scopes: ${tokens.scope}`);
     console.log(`   Expires: ${expiryDate}`);
+    if (!tokens.refresh_token) {
+      console.log('   ⚠️  No refresh token — re-run `npm run auth` before expiry date');
+    }
     console.log('\nYou can stop this server with Ctrl+C\n');
 
   } catch (err: unknown) {
