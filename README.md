@@ -1,8 +1,8 @@
-# Social MCP Servers
+# MCP Servers
 
-Colección de servidores MCP (Model Context Protocol) que permiten a Claude interactuar con redes sociales y servicios externos desde lenguaje natural.
+Colección de servidores MCP (Model Context Protocol) que permiten a Claude interactuar con servicios externos desde lenguaje natural.
 
-El proyecto está pensado para crecer: se irán añadiendo nuevos MCPs, mejoras a los existentes e integraciones con más plataformas.
+El proyecto está pensado para crecer: se irán añadiendo nuevos MCPs de todo tipo según vayan siendo útiles.
 
 ---
 
@@ -80,20 +80,6 @@ Archivos de configuración de Claude:
 - Node.js v18+
 - Claude Code o Claude Desktop
 - Cuenta de desarrollador en la plataforma correspondiente
-
----
-
-## Roadmap
-
-Posibles mejoras y nuevos servidores que se podrían añadir:
-
-- **instagram-mcp** — Publicación y gestión de contenido en Instagram
-- **bluesky-mcp** — Integración con Bluesky (AT Protocol)
-- **reddit-mcp** — Posts, comentarios y subreddits
-- **youtube-mcp** — Gestión de canal, comentarios y búsqueda
-- Mejoras en los MCPs existentes: soporte para vídeo en X, analíticas, programación de publicaciones
-
-Las contribuciones y sugerencias son bienvenidas.
 
 ---
 
