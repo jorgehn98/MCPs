@@ -16,6 +16,4 @@ Thumbs.db
 .vscode/
 *.swp
 
-# Claude Code internal
-.claude/
-CLAUDE.md
+# OpenCode project config lives in opencode.json / .opencode/
