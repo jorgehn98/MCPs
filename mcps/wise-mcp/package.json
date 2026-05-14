@@ -1,0 +1,23 @@
+{
+  "name": "wise-mcp",
+  "version": "1.0.0",
+  "description": "Wise MCP Server — read-only access to balances, transactions and exchange rates",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "axios": "^1.8.4",
+    "dotenv": "^16.4.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}

@@ -35,34 +35,38 @@ Integración con la X API v2 mediante OAuth 2.0 + PKCE. Cubre tweets, búsqueda,
 
 ## Instalación rápida
 
-Cada servidor es independiente. El proceso general es:
+No es necesario clonar el repositorio. Usa `npx` directamente.
+
+**1. Autenticación OAuth (una sola vez por servidor):**
 
 ```bash
-# 1. Entra en el directorio del servidor
-cd linkedin-mcp   # o x-mcp
+# X (Twitter)
+X_CLIENT_ID=tu_id X_CLIENT_SECRET=tu_secret npx x-mcp --auth
 
-# 2. Instala dependencias y compila
-npm install && npm run build
-
-# 3. Configura credenciales
-cp .env.example .env   # edita el .env con tus claves
-
-# 4. Autenticación OAuth (una sola vez)
-npm run auth
+# LinkedIn
+LINKEDIN_CLIENT_ID=tu_id LINKEDIN_CLIENT_SECRET=tu_secret npx linkedin-mcp --auth
 ```
 
-Luego añade el servidor a tu configuración de Claude:
+**2. Añade los servidores a tu configuración de Claude:**
 
 ```json
 {
   "mcpServers": {
     "linkedin": {
-      "command": "node",
-      "args": ["/ruta/absoluta/MCPs/linkedin-mcp/dist/index.js"]
+      "command": "npx",
+      "args": ["-y", "linkedin-mcp"],
+      "env": {
+        "LINKEDIN_CLIENT_ID": "tu_client_id",
+        "LINKEDIN_CLIENT_SECRET": "tu_client_secret"
+      }
     },
     "x": {
-      "command": "node",
-      "args": ["/ruta/absoluta/MCPs/x-mcp/dist/index.js"]
+      "command": "npx",
+      "args": ["-y", "x-mcp"],
+      "env": {
+        "X_CLIENT_ID": "tu_client_id",
+        "X_CLIENT_SECRET": "tu_client_secret"
+      }
     }
   }
 }
