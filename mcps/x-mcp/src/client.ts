@@ -6,10 +6,14 @@ config();
 
 export const API_BASE = 'https://api.x.com/2';
 export const UPLOAD_BASE = 'https://upload.twitter.com/1.1';
+export const HERMES_TWEET_DEFAULT_BASE = 'https://xquik.com';
 
 const CLIENT_ID = process.env.X_CLIENT_ID;
 const CLIENT_SECRET = process.env.X_CLIENT_SECRET;
 const BEARER_TOKEN = process.env.X_BEARER_TOKEN;
+const HERMES_TWEET_API_KEY = process.env.HERMES_TWEET_API_KEY || process.env.XQUIK_API_KEY;
+const HERMES_TWEET_BASE_URL =
+  process.env.HERMES_TWEET_BASE_URL || process.env.XQUIK_BASE_URL || HERMES_TWEET_DEFAULT_BASE;
 
 // Default field sets for rich responses
 export const TWEET_FIELDS = 'id,text,author_id,created_at,public_metrics,referenced_tweets,attachments,conversation_id,in_reply_to_user_id,possibly_sensitive,reply_settings,source,lang';
@@ -65,6 +69,20 @@ function getBearerToken(): string {
     throw new Error('X_BEARER_TOKEN not set. Add it to your .env file for app-only requests.');
   }
   return BEARER_TOKEN;
+}
+
+function getHermesTweetApiKey(): string {
+  if (!HERMES_TWEET_API_KEY) {
+    throw new Error('HERMES_TWEET_API_KEY or XQUIK_API_KEY not set. Add one to your .env file to use Hermes Tweet read tools.');
+  }
+  return HERMES_TWEET_API_KEY;
+}
+
+function hermesTweetHeaders(apiKey: string): Record<string, string> {
+  if (apiKey.startsWith('xq_')) {
+    return { 'x-api-key': apiKey, 'Content-Type': 'application/json' };
+  }
+  return { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' };
 }
 
 // ─── HTTP helpers ──────────────────────────────────────────────────────────────
@@ -135,6 +153,27 @@ export async function appRequest<T>(
   return res.data as T;
 }
 
+/** Hermes Tweet/Xquik read request for optional public X data tools. */
+export async function hermesTweetRequest<T>(
+  path: string,
+  params?: Record<string, unknown>
+): Promise<T> {
+  if (!path.startsWith('/api/v1/')) {
+    throw new Error('Hermes Tweet paths must start with /api/v1/.');
+  }
+
+  const apiKey = getHermesTweetApiKey();
+  const baseUrl = HERMES_TWEET_BASE_URL.replace(/\/$/, '');
+  const res = await axios({
+    method: 'GET',
+    url: `${baseUrl}${path}`,
+    params,
+    headers: hermesTweetHeaders(apiKey),
+    timeout: 30000,
+  });
+  return res.data as T;
+}
+
 // ─── Error handling ────────────────────────────────────────────────────────────
 
 export function handleApiError(error: unknown): string {
@@ -162,6 +201,39 @@ export function handleApiError(error: unknown): string {
       }
     } else if (error.code === 'ECONNABORTED') {
       return 'Error: Request timed out — please try again.';
+    }
+  }
+  return `Error: ${error instanceof Error ? error.message : String(error)}`;
+}
+
+export function handleHermesTweetError(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    if (error.response) {
+      const status = error.response.status;
+      const data = error.response.data as Record<string, unknown> | undefined;
+      const detail =
+        (data?.error as string | undefined) ||
+        (data?.message as string | undefined) ||
+        (data?.detail as string | undefined) ||
+        '';
+      switch (status) {
+        case 400:
+          return `Error: Hermes Tweet bad request — ${detail || 'check your parameters.'}`;
+        case 401:
+          return 'Error: Hermes Tweet unauthorized — check HERMES_TWEET_API_KEY or XQUIK_API_KEY.';
+        case 402:
+          return `Error: Hermes Tweet payment required — ${detail || 'check account credits.'}`;
+        case 403:
+          return `Error: Hermes Tweet forbidden — ${detail || 'check API key permissions.'}`;
+        case 404:
+          return 'Error: Hermes Tweet result not found or not accessible.';
+        case 429:
+          return 'Error: Hermes Tweet rate limit exceeded — please wait before retrying.';
+        default:
+          return `Error: Hermes Tweet request failed with status ${status}${detail ? ` — ${detail}` : ''}`;
+      }
+    } else if (error.code === 'ECONNABORTED') {
+      return 'Error: Hermes Tweet request timed out — please try again.';
     }
   }
   return `Error: ${error instanceof Error ? error.message : String(error)}`;

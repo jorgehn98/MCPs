@@ -13,8 +13,11 @@ Una vez instalado, Claude puede:
 | `x_delete_tweet` | Eliminar un tweet propio |
 | `x_get_tweet` | Obtener un tweet por ID |
 | `x_get_tweets` | Obtener hasta 100 tweets por ID |
+| `x_hermes_get_tweet` | Obtener un tweet por ID con Hermes Tweet/Xquik |
+| `x_hermes_get_article` | Obtener el contenido completo de un X Article |
 | `x_get_home_timeline` | Ver el timeline cronológico de cuentas seguidas |
 | `x_search_recent_tweets` | Buscar tweets de los últimos 7 días |
+| `x_hermes_search_tweets` | Buscar tweets con Hermes Tweet/Xquik |
 | `x_get_user_tweets` | Ver los tweets de un usuario |
 | `x_get_user_mentions` | Ver menciones de un usuario |
 | `x_get_tweet_counts` | Contar tweets que coinciden con una búsqueda |
@@ -116,6 +119,7 @@ Una vez instalado, Claude puede:
 - [Node.js](https://nodejs.org/) v18 o superior
 - [Claude Code](https://claude.ai/code) o Claude Desktop
 - Una [X Developer App](https://developer.x.com/) con OAuth 2.0 habilitado y plan **Basic** o superior
+- Opcional: una clave de Hermes Tweet/Xquik para las herramientas read-only `x_hermes_*`
 
 ## Instalación
 
@@ -159,6 +163,7 @@ src/
 - Los **access tokens de X duran 2 horas** por diseño. El servidor los refresca automáticamente usando el refresh token (que dura indefinidamente mientras no se revoque).
 - Si el refresh token expira (por revocación o inactividad prolongada), ejecuta `npm run auth` de nuevo.
 - Algunos endpoints requieren el **plan Basic** de la X API ($100/mes). Los endpoints públicos de lectura funcionan con el plan Free.
+- Las herramientas `x_hermes_get_tweet`, `x_hermes_get_article` y `x_hermes_search_tweets` son opcionales, read-only y usan `HERMES_TWEET_API_KEY` o `XQUIK_API_KEY`. No cambian el flujo OAuth ni las herramientas de escritura existentes.
 - `x_upload_media` soporta imágenes (JPG, PNG, GIF) de hasta 5 MB. Para vídeo, la X API v2 tiene limitaciones según el plan.
 
 ## Licencia

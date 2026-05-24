@@ -1,6 +1,15 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { userRequest, appRequest, handleApiError, TWEET_FIELDS, USER_FIELDS, TWEET_EXPANSIONS } from '../client.js';
+import {
+  userRequest,
+  appRequest,
+  hermesTweetRequest,
+  handleApiError,
+  handleHermesTweetError,
+  TWEET_FIELDS,
+  USER_FIELDS,
+  TWEET_EXPANSIONS,
+} from '../client.js';
 import type { XApiResponse, XTweet, XUser } from '../types/x.js';
 
 export function registerTweetTools(server: McpServer) {
@@ -26,6 +35,40 @@ export function registerTweetTools(server: McpServer) {
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       } catch (err) {
         return { content: [{ type: 'text', text: handleApiError(err) }], isError: true };
+      }
+    }
+  );
+
+  // ── Hermes Tweet: Get Tweet ────────────────────────────────────────────────
+  server.tool(
+    'x_hermes_get_tweet',
+    'Get a tweet by ID through the optional Hermes Tweet/Xquik read backend. Requires HERMES_TWEET_API_KEY or XQUIK_API_KEY.',
+    {
+      tweet_id: z.string().describe('The tweet ID to retrieve'),
+    },
+    async ({ tweet_id }) => {
+      try {
+        const data = await hermesTweetRequest<unknown>(`/api/v1/x/tweets/${encodeURIComponent(tweet_id)}`);
+        return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: handleHermesTweetError(err) }], isError: true };
+      }
+    }
+  );
+
+  // ── Hermes Tweet: Get X Article ────────────────────────────────────────────
+  server.tool(
+    'x_hermes_get_article',
+    'Get full X Article content for a tweet ID through the optional Hermes Tweet/Xquik read backend.',
+    {
+      tweet_id: z.string().describe('The tweet ID that owns the X Article'),
+    },
+    async ({ tweet_id }) => {
+      try {
+        const data = await hermesTweetRequest<unknown>(`/api/v1/x/articles/${encodeURIComponent(tweet_id)}`);
+        return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: handleHermesTweetError(err) }], isError: true };
       }
     }
   );
@@ -154,6 +197,37 @@ export function registerTweetTools(server: McpServer) {
         return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
       } catch (err) {
         return { content: [{ type: 'text', text: handleApiError(err) }], isError: true };
+      }
+    }
+  );
+
+  // ── Hermes Tweet: Search Tweets ────────────────────────────────────────────
+  server.tool(
+    'x_hermes_search_tweets',
+    'Search X/Twitter through the optional Hermes Tweet/Xquik read backend. Supports X query operators and pagination.',
+    {
+      query: z.string().min(1).max(4096).describe('Search query with X operators. Example: "from:elonmusk lang:en -is:retweet"'),
+      limit: z.number().int().min(1).max(100).default(20).describe('Maximum tweets to return (1-100)'),
+      query_type: z.enum(['Latest', 'Top']).default('Latest').describe('Sort order: Latest or Top'),
+      cursor: z.string().optional().describe('Pagination cursor from a previous Hermes Tweet response'),
+      since_time: z.string().optional().describe('ISO 8601 timestamp; only return tweets after this time'),
+      until_time: z.string().optional().describe('ISO 8601 timestamp; only return tweets before this time'),
+    },
+    async ({ query, limit, query_type, cursor, since_time, until_time }) => {
+      try {
+        const params: Record<string, unknown> = {
+          q: query,
+          limit,
+          queryType: query_type,
+        };
+        if (cursor) params.cursor = cursor;
+        if (since_time) params.sinceTime = since_time;
+        if (until_time) params.untilTime = until_time;
+
+        const data = await hermesTweetRequest<unknown>('/api/v1/x/tweets/search', params);
+        return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: handleHermesTweetError(err) }], isError: true };
       }
     }
   );
