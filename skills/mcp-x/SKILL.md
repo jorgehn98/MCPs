@@ -32,15 +32,19 @@ X identifies users and tweets with **numeric string IDs**, not URNs.
 
 - **User tokens (OAuth 2.0 PKCE)** — required for all write operations and private data: posting, liking, retweeting, following, DMs, bookmarks, blocks, mutes
 - **Bearer Token (app-only)** — sufficient for reading public data: search, user lookup, tweet lookup, timelines. The server automatically uses user tokens when available, falling back to Bearer Token for public reads.
+- **Hermes Tweet/Xquik key (optional)** — enables read-only `x_hermes_*` tools for tweet lookup, X Article extraction, and broader X query search without changing OAuth or write behavior. Configure `HERMES_TWEET_API_KEY` or `XQUIK_API_KEY`.
 
 ## Available tools (quick reference)
 
 **Tweets**
 - `x_get_tweet` — get a single tweet by ID
 - `x_get_tweets` — get up to 100 tweets by comma-separated IDs
+- `x_hermes_get_tweet` — get a single tweet by ID through Hermes Tweet/Xquik
+- `x_hermes_get_article` — get full X Article content by tweet ID through Hermes Tweet/Xquik
 - `x_create_tweet` — post a tweet (text, reply, quote, poll, or with media)
 - `x_delete_tweet` — delete a tweet you own
 - `x_search_recent_tweets` — search tweets from the last 7 days with X operators
+- `x_hermes_search_tweets` — search X with Hermes Tweet/Xquik query operators and pagination
 - `x_get_user_tweets` — get a user's tweet timeline (up to 3,200 most recent)
 - `x_get_user_mentions` — get tweets mentioning a user
 - `x_get_home_timeline` — get the auth user's reverse-chronological home feed

@@ -37,6 +37,10 @@ X_CLIENT_ID=tu_client_id_aqui
 X_CLIENT_SECRET=tu_client_secret_aqui
 X_REDIRECT_URI=http://localhost:3000/callback
 AUTH_PORT=3000
+
+# Opcional: habilita herramientas read-only x_hermes_* con Hermes Tweet/Xquik
+# HERMES_TWEET_API_KEY=xq_...
+# HERMES_TWEET_BASE_URL=https://xquik.com
 ```
 
 ## 4. Autenticarse (una sola vez)
@@ -88,8 +92,11 @@ Reinicia Claude. El servidor X estará disponible y Claude podrá usarlo inmedia
 | `x_delete_tweet` | Eliminar un tweet propio |
 | `x_get_tweet` | Obtener un tweet por ID |
 | `x_get_tweets` | Obtener hasta 100 tweets por ID |
+| `x_hermes_get_tweet` | Obtener tweet vía Hermes Tweet/Xquik |
+| `x_hermes_get_article` | Obtener X Article vía Hermes Tweet/Xquik |
 | `x_get_home_timeline` | Timeline de cuentas seguidas |
 | `x_search_recent_tweets` | Buscar tweets (últimos 7 días) |
+| `x_hermes_search_tweets` | Buscar tweets vía Hermes Tweet/Xquik |
 | `x_get_user_tweets` | Tweets de un usuario |
 | `x_get_user_mentions` | Menciones de un usuario |
 | `x_get_tweet_counts` | Contar tweets por búsqueda |
